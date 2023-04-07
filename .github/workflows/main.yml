@@ -1,4 +1,3 @@
-# .github/workflows/**main.yml**
 name: Django-app workflow
 
 on: [push]
@@ -16,16 +15,12 @@ jobs:
 
     - name: Install dependencies
       run: | 
-        # РѕР±РЅРѕРІР»РµРЅРёРµ pip
         python -m pip install --upgrade pip 
-        # СѓСЃС‚Р°РЅРѕРІРєР° flake8 Рё РµРіРѕ РїР»Р°РіРёРЅРѕРІ
         pip install flake8 pep8-naming flake8-broken-line flake8-return flake8-isort
-        # СѓСЃС‚Р°РЅРѕРІРєР° Р·Р°РІРёСЃРёРјРѕСЃС‚РµР№
         pip install -r requirements.txt 
 
     - name: Test with flake8 and django tests
       run: |
-        # Р·Р°РїСѓСЃРє РїСЂРѕРІРµСЂРєРё РїСЂРѕРµРєС‚Р° РїРѕ flake8
         python -m flake8
         cd infra_project/
         python manage.py test
@@ -35,19 +30,15 @@ jobs:
     needs: tests
     steps:
       - name: Check out the repo
-        # Проверка доступности репозитория Docker Hub для workflow
         uses: actions/checkout@v2 
       - name: Set up Docker Buildx
-        # Вызов сборщика контейнеров docker
         uses: docker/setup-buildx-action@v1 
       - name: Login to Docker 
-        # Запуск скрипта авторизации на Docker Hub
         uses: docker/login-action@v1 
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Push to Docker Hub
-        # Пуш образа в Docker Hub 
+      - name: Push to Docker Hub 
         uses: docker/build-push-action@v2 
         with:
           push: true
@@ -62,10 +53,8 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH }}
-        passphrase: ${{ secrets.PASSPHRASE }} # Если ваш ssh-ключ защищён фразой-паролем
+        passphrase: ${{ secrets.PASSPHRASE }}
         script: |
-          # Выполняет pull образа с DockerHub
           sudo docker pull olaro/confident_wozniak
-          #остановка всех контейнеров
           sudo docker stop $(sudo docker ps -a -q)
           sudo docker run --rm -d -p 5000:5000 olaro/confident_wozniak
